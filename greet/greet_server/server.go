@@ -1,6 +1,8 @@
 package main
 
 import (
+	"context"
+	"fmt"
 	"log"
 	"net"
 
@@ -8,7 +10,16 @@ import (
 	"google.golang.org/grpc"
 )
 
-type server struct{}
+type server struct {
+	greetpb.UnimplementedGreetServiceServer
+}
+
+func (s server) Greet(ctx context.Context, request *greetpb.GreetRequest) (*greetpb.GreetResponse, error) {
+	message := fmt.Sprintf("Hello %s %s", request.Greeting.FirstName, request.Greeting.LastName)
+	return &greetpb.GreetResponse{
+		Result: message,
+	}, nil
+}
 
 func main() {
 
@@ -25,4 +36,5 @@ func main() {
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
+
 }
